@@ -1,0 +1,8 @@
+.main {
+    background-image: url("assets/images/budget-management.jpg");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    width: 100vw;
+    height: 100vh;
+}

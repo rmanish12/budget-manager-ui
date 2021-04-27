@@ -1,0 +1,204 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-float infinite 3s ease-in-out;
+  }
+}
+
+.App-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+}
+
+.App-link {
+  color: rgb(112, 76, 182);
+}
+
+@keyframes App-logo-float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.main {
+  /* background-image: url("/assets/images/budget-management.jpg"); */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  width: 100vw;
+  height: 100vh;
+}
+
+.login-card {
+  margin-top: 30vh;
+}
+
+.brand-name-div {
+  text-align: center;
+  padding-top: 2%;
+}
+
+.brand-name {
+  text-transform: uppercase;
+  font-size: xx-large;
+  color: #39CCCC !important;
+}
+
+.form-field {
+  width: 90%;
+  margin-left: 5% !important;
+  margin-top: 2% !important;
+}
+
+.login-button {
+  background-color: #39CCCC !important;
+  width: 90%;
+  margin-left: 5% !important;
+  margin-bottom: 2% !important;
+  margin-top: 2% !important;
+  min-height: 50px;
+}
+
+/* .login-button:hover {
+  background-color: white !important;
+  transform: scale(1.1);
+  border: #39CCCC 2px solid;
+  color: #39CCCC
+} */
+
+.forgot-password-div {
+  text-align: center;
+  padding-bottom: 2% !important;
+}
+
+.forgot-password {
+  font-style: italic;
+  cursor: pointer;
+  color: #39CCCC !important;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.align-center {
+  text-align: center;
+}
+
+.loader {
+  padding: 5vh
+}
+
+.error {
+  margin-left: 5%;
+  color: red;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.wd-90 {
+  width: 90%;
+}
+
+.city-box {
+  margin-left: 10% !important;
+}
+
+.pincode-box {
+  width: 90% !important;
+}
+
+.add-store-label {
+  text-align: center;
+  padding-top: 2% !important;
+  font-size: x-large;
+  text-transform: uppercase;
+}
+
+.buttons-container {
+  text-align: right;
+  padding-bottom: 2% !important;
+}
+
+.inner-form-button {
+  margin-right: 5% !important;
+  width: 15vw !important;
+}
+
+.success-modal {
+  background-color: #4BB543;
+  font-style: italic;
+}
+
+.warning-modal {
+  background-color: #FFCC00;
+  font-style: italic;
+}
+
+.error-modal {
+  background-color: #FF0000;
+  font-style: italic;
+}
+
+.min-wd-100 {
+  min-width: 100%;
+}
+
+.pagination-block {
+  text-align: right;
+  margin: 2vh 7vw;
+  padding-bottom: 1%;
+}
+
+.pagination-label {
+  margin-right: 30px;
+  font-size: smaller;
+}
+
+.pagination-dropdown {
+  margin-right: 40px;
+}
+
+.pagination-previous {
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.pagination-next {
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 600px) {
+  .city-box {
+      margin-left: 0% !important;
+  }
+
+  .pincode-box {
+      width: 100% !important;
+  }
+
+  .inner-form-button {
+      width: 90% !important;
+      margin-right: 5% !important;
+      margin-top: 2% !important;
+  }
+}
