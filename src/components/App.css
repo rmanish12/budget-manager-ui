@@ -188,17 +188,56 @@
 }
 
 @media only screen and (max-width: 600px) {
-  .city-box {
-      margin-left: 0% !important;
+  .budget-month-info-span {
+    font-size: large !important;
+    font-weight: bold !important;
+    font-style: italic !important;
   }
+}
 
-  .pincode-box {
-      width: 100% !important;
-  }
+.budget-month-info-div {
+  padding: 1%;
+  text-align: center;
+}
 
-  .inner-form-button {
-      width: 90% !important;
-      margin-right: 5% !important;
-      margin-top: 2% !important;
-  }
+.budget-month-info-span {
+  font-size: xx-large;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.monthly-budget-keys {
+  font-size: x-large;
+  font-weight: bold;
+  font-style: italic;
+  margin-left: 15%;
+}
+
+.monthly-budget-value {
+  font-weight: 300;
+  font-size: xx-large;
+  /* color: white; */
+  float: right;
+  margin-right: 20%;
+}
+
+.monthly-budget-income-text {
+  color: #b3ffb3 !important;
+  font-style: italic !important;
+}
+
+.monthly-budget-expense-text {
+  color: #ffb3b3 !important;
+  font-style: italic !important;
+}
+
+table, th, td {
+  border: 1px solid black;
+  padding: 5px;
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  margin: 0% auto;
 }

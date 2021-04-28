@@ -1,21 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, KeyboardEvent, MouseEvent } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import SideDrawer from "../sideDrawer/SideDrawer";
+import { onLogout } from "../../../actions/authAction";
 
 import {
   AppBar,
   Toolbar,
   Typography,
-  IconButton
+  IconButton,
+  Tooltip,
 } from "@material-ui/core";
 
 import MenuIcon from "@material-ui/icons/Menu";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import { useAppDispatch } from "../../../store/hooks";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      flexGrow: 1
+      flexGrow: 1,
     },
     menuButton: {
       marginRight: theme.spacing(2),
@@ -29,20 +32,27 @@ const useStyles = makeStyles((theme: Theme) =>
 const MenuAppBar = () => {
   const classes = useStyles();
 
+  const dispatch = useAppDispatch();
+
   const [showDrawer, setShowDrawer] = useState<boolean>(false);
 
   const toggleDrawer = (open: boolean) => (
-    event: React.KeyboardEvent | React.MouseEvent,
+    event: KeyboardEvent | MouseEvent
   ) => {
     if (
-      event.type === 'keydown' &&
-      ((event as React.KeyboardEvent).key === 'Tab' ||
-        (event as React.KeyboardEvent).key === 'Shift')
+      event.type === "keydown" &&
+      ((event as KeyboardEvent).key === "Tab" ||
+        (event as KeyboardEvent).key === "Shift")
     ) {
       return;
     }
 
     setShowDrawer(open);
+  };
+
+  const onLogoutHandler = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    dispatch(onLogout());
   };
 
   return (
@@ -62,25 +72,24 @@ const MenuAppBar = () => {
             BUDGET MANAGER
           </Typography>
           <div>
-            <IconButton
-              aria-label="logout"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-            //   onClick={handleMenu}
-              color="inherit"
-            >
-              <ExitToAppIcon />
-            </IconButton>
+            <Tooltip title="Logout">
+              <IconButton
+                aria-label="logout"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={onLogoutHandler}
+                color="inherit"
+              >
+                <ExitToAppIcon />
+              </IconButton>
+            </Tooltip>
           </div>
         </Toolbar>
       </AppBar>
 
-      <SideDrawer
-        showDrawer={showDrawer}
-        toggleDrawer={toggleDrawer}
-      />
+      <SideDrawer showDrawer={showDrawer} toggleDrawer={toggleDrawer} />
     </div>
   );
-}
+};
 
 export default MenuAppBar;
