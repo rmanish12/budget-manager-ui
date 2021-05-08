@@ -1,6 +1,26 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import "date-fns";
+import React, { useState, ChangeEvent, FormEvent, MouseEvent } from "react";
 import _ from "lodash";
-import { TextField, Button, Select, MenuItem } from "@material-ui/core";
+import moment from "moment";
+import DateFnsUtils from "@date-io/date-fns";
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
+import {
+  validateEmail,
+  validatePassword,
+  validateFirstName,
+  comparePassword,
+} from "../../../helper/validator";
+import {
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+} from "@material-ui/core";
 import "../../App.css";
 
 interface RegisterationField {
@@ -18,7 +38,10 @@ interface RegistrationValidationError {
   isEmailValid: boolean;
   isPasswordValid: boolean;
   isConfirmPasswordValid: boolean;
-  isFormValid: boolean;
+}
+
+interface RegisterPropsI {
+  switchLoginWindow: (value: boolean) => void;
 }
 
 const initialFormFieldValues: RegisterationField = {
@@ -27,7 +50,7 @@ const initialFormFieldValues: RegisterationField = {
   email: "",
   password: "",
   confirmPassword: "",
-  dateOfBirth: null,
+  dateOfBirth: new Date(moment().format("MM/DD/YYYY")),
   gender: "",
 };
 
@@ -36,10 +59,12 @@ const initialValidationState: RegistrationValidationError = {
   isEmailValid: true,
   isPasswordValid: true,
   isConfirmPasswordValid: true,
-  isFormValid: false,
 };
 
-const Register = () => {
+const Register: React.FC<RegisterPropsI> = (props) => {
+
+  const { switchLoginWindow } = props;
+
   const [userDetails, setUserDetails] = useState<RegisterationField>(
     _.cloneDeep(initialFormFieldValues)
   );
@@ -51,9 +76,12 @@ const Register = () => {
     _.cloneDeep(initialValidationState)
   );
 
-  useEffect(() => {
-    console.log("inside useEffect:", validatedFields);
-  }, [validatedFields]);
+  const handleDateChange = (date: Date | null) => {
+    setUserDetails({
+      ...userDetails,
+      dateOfBirth: date
+    })
+  };
 
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name;
@@ -75,68 +103,63 @@ const Register = () => {
   const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    updateFormValidityState("isFormValid", false);
-    validateFormFields();
+    setValidatedFields(_.cloneDeep(initialValidationState)); // NOT WORKING
 
-    if (validatedFields.isFormValid) {
-      console.log("fields valid");
+    if (validateFormFields()) {
+      console.log("valid fields");
     } else {
-      console.log("fields invalid");
+      console.log("invalid fields");
     }
-
-    console.log(userDetails);
   };
 
-  const updateFormValidityState = (
-    key: keyof RegistrationValidationError,
-    value: boolean
-  ) => {
-    const validitystate: RegistrationValidationError = _.clone(validatedFields);
-    validatedFields[key] = value;
-    console.log('key, value: ', key, value);
-    console.log(validitystate)
-    setValidatedFields(validitystate);
-  };
-
-  const validateFormFields = () => {
+  const validateFormFields = (): boolean => {
     const { firstName, email, password, confirmPassword } = userDetails;
 
-    console.log(firstName, email, password, confirmPassword);
-    console.log(validatedFields);
-    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-
     if (
-      !_.isEmpty(firstName) &&
-      emailRegex.test(email) &&
-      !_.isEmpty(password) &&
-      _.isEqual(password, confirmPassword)
+      validateEmail(email) &&
+      validatePassword(password) &&
+      comparePassword(password, confirmPassword) &&
+      validateFirstName(firstName)
     ) {
-      updateFormValidityState("isFormValid", true);
+      return true;
     } else {
-      console.log(_.isEmpty(firstName));
-      if (_.isEmpty(firstName)) {
-        updateFormValidityState("isFirstNameValid", false);
-      }
-      console.log(!emailRegex.test(email));
-      if (!emailRegex.test(email)) {
-        updateFormValidityState("isEmailValid", false);
-      }
-      console.log(_.isEmpty(password));
-      if (_.isEmpty(password)) {
-        updateFormValidityState("isPasswordValid", false);
-      }
-      console.log(!_.isEqual(password, confirmPassword));
-      if (!_.isEqual(password, confirmPassword)) {
-        updateFormValidityState("isConfirmPasswordValid", false);
+      const validatationState = _.clone(validatedFields);
+
+      if (!validateEmail(email)) {
+        validatationState.isEmailValid = false;
       }
 
-      console.log(validatedFields);
+      if (!validatePassword(password)) {
+        validatationState.isPasswordValid = false;
+      }
+
+      if (!comparePassword(password, confirmPassword)) {
+        validatationState.isConfirmPasswordValid = false;
+      }
+
+      if (!validateFirstName(firstName)) {
+        validatationState.isFirstNameValid = false;
+      }
+
+      setValidatedFields(validatationState);
+
+      return false;
     }
   };
+
+  const onResetFormFields = (e: FormEvent<HTMLFormElement>) => {
+    console.log("clicked");
+    const userDetails = _.clone(initialFormFieldValues);
+    setUserDetails(userDetails);
+  }
+
+  const onSwitchToLoginWindow = (e: MouseEvent<HTMLDivElement>) => {
+    switchLoginWindow(true);
+  }
 
   return (
     <>
-      <form onSubmit={onSubmitHandler}>
+      <form onSubmit={onSubmitHandler} onReset={onResetFormFields}>
         <div>
           <TextField
             id="firstName"
@@ -207,35 +230,37 @@ const Register = () => {
         </div>
 
         <div>
-          <TextField
-            id="dateOfBirth"
-            name="dateOfBirth"
-            label="Date Of Birth"
-            type="date"
-            variant="outlined"
-            className="form-field"
-            defaultValue="1990-01-01"
-            value={userDetails.dateOfBirth}
-            onChange={onChangeHandler}
-          />
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <KeyboardDatePicker
+              margin="normal"
+              id="dateOfBirth"
+              name="dateOfBirth"
+              label="Date Of Birth"
+              format="MM/dd/yyyy"
+              className="form-field"
+              value={userDetails.dateOfBirth}
+              onChange={handleDateChange}
+            />
+          </MuiPickersUtilsProvider>
         </div>
 
         <div>
-          <Select
-            id="gender"
-            name="gender"
-            label="Gender"
-            className="form-field"
-            variant="outlined"
-            value={userDetails.gender}
-            onChange={onSelectHandler}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={"Male"}>Male</MenuItem>
-            <MenuItem value={"Female"}>Female</MenuItem>
-          </Select>
+          <FormControl variant="outlined" className="form-field">
+            <InputLabel>Gender</InputLabel>
+            <Select
+              id="gender"
+              name="gender"
+              label="Gender"
+              value={userDetails.gender}
+              onChange={onSelectHandler}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              <MenuItem value={"Male"}>Male</MenuItem>
+              <MenuItem value={"Female"}>Female</MenuItem>
+            </Select>
+          </FormControl>
         </div>
 
         <Button className="login-button" type="submit">
@@ -260,7 +285,7 @@ const Register = () => {
         </ul>
       </div>
 
-      <div className="forgot-password-div">
+      <div className="forgot-password-div" onClick={onSwitchToLoginWindow}>
         <span className="forgot-password">Already Registered? Sign In</span>
       </div>
     </>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../App.css";
 
 import Login from "./login/Login";
@@ -7,6 +7,13 @@ import Register from "./register/Register";
 import { Grid, Paper } from "@material-ui/core";
 
 const Main = () => {
+
+  const [isLoginOpen, setLoginOpen] = useState<boolean>(true);
+
+  const switchLoginWindow = (value: boolean) => {
+    setLoginOpen(value);
+  }
+
   return (
     <div>
       <Grid container justify="center">
@@ -16,8 +23,8 @@ const Main = () => {
               <div className="brand-name-div">
                 <span className="brand-name">Budget Manager</span>
               </div>
-              {/* <Login /> */}
-              <Register />
+
+              {isLoginOpen ? <Login switchLoginWindow={switchLoginWindow}/> : <Register switchLoginWindow={switchLoginWindow}/>}
             </Paper>
           </div>
         </Grid>

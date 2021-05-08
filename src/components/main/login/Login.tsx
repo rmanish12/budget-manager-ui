@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, MouseEvent } from "react";
 import "../../App.css";
 import { onLogin, LoginI } from "../../../actions/authAction";
 
@@ -6,12 +6,14 @@ import { TextField, Button } from "@material-ui/core";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 
 interface LoginPropsI {
-  // onLogin: (credentials: LoginI) => void;
+  switchLoginWindow: (value: boolean) => void;
 }
 
 const Login: React.FC<LoginPropsI> = (props) => {
   const dispatch = useAppDispatch();
   const errorMessage = useAppSelector((state) => state.auth.loginError);
+
+  const { switchLoginWindow } = props;
 
   const [credentials, setCredentials] = useState<LoginI>({
     email: "",
@@ -32,6 +34,10 @@ const Login: React.FC<LoginPropsI> = (props) => {
     e.preventDefault();
     dispatch(onLogin(credentials));
   };
+
+  const onSwitchToRegisterWindow = (e: MouseEvent<HTMLDivElement>) => {
+    switchLoginWindow(false);
+  }
 
   return (
     <>
@@ -72,7 +78,7 @@ const Login: React.FC<LoginPropsI> = (props) => {
         <span className="forgot-password">Forgot Password?</span>
       </div>
 
-      <div className="forgot-password-div">
+      <div className="forgot-password-div" onClick={onSwitchToRegisterWindow}>
         <span className="forgot-password">Create Account?</span>
       </div>
     </>
