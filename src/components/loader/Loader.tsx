@@ -12,7 +12,7 @@ const Loader: React.FC<LoaderProps> = (props): JSX.Element => {
       size="sm"
       aria-labelledby="contained-modal-title-vcenter"
       centered
-      show="true"
+      show={props.show}
     >
       <Modal.Body>
         <div style={{textAlign: "center"}}>

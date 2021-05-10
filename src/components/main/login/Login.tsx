@@ -1,8 +1,9 @@
-import React, { useState, ChangeEvent, FormEvent, MouseEvent } from "react";
+import React, { useState, useRef, ChangeEvent, FormEvent, MouseEvent, useLayoutEffect } from "react";
 import "../../App.css";
 import { onLogin, LoginI } from "../../../actions/authAction";
 
 import { TextField, Button } from "@material-ui/core";
+import Loader from "../../loader/Loader";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 
 interface LoginPropsI {
@@ -11,15 +12,22 @@ interface LoginPropsI {
 
 const Login: React.FC<LoginPropsI> = (props) => {
   const dispatch = useAppDispatch();
-  const errorMessage = useAppSelector((state) => state.auth.loginError);
+  const errorMessage = useAppSelector((state) => state.auth.loginError); // loginError value from auth reducer
+  const showLoader = useAppSelector((state) => state.auth.isLoading); // isLoading value from auth reducer
 
+  // function to switch to register screen
   const { switchLoginWindow } = props;
 
+  // using ref to refer email input
+  const emailInput = useRef<HTMLInputElement>(null);
+
+  // defining state to get user credentials
   const [credentials, setCredentials] = useState<LoginI>({
     email: "",
     password: "",
   });
 
+  // handler to set value from user changes
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -30,14 +38,23 @@ const Login: React.FC<LoginPropsI> = (props) => {
     });
   };
 
+  // handler to perform operation when form is submitted
   const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch(onLogin(credentials));
   };
 
+  // function that gets called when user wants to switch to register screen
   const onSwitchToRegisterWindow = (e: MouseEvent<HTMLDivElement>) => {
     switchLoginWindow(false);
   }
+
+  // useLayoutEffect to set focus on email input field
+  useLayoutEffect(() => {
+    if (emailInput && emailInput.current) {
+      emailInput.current.focus();
+    }
+  })
 
   return (
     <>
@@ -50,6 +67,7 @@ const Login: React.FC<LoginPropsI> = (props) => {
             variant="outlined"
             label="Email"
             className="form-field"
+            inputRef={emailInput}
             value={credentials.email}
             onChange={onChangeHandler}
           />
@@ -81,6 +99,8 @@ const Login: React.FC<LoginPropsI> = (props) => {
       <div className="forgot-password-div" onClick={onSwitchToRegisterWindow}>
         <span className="forgot-password">Create Account?</span>
       </div>
+
+      <Loader show={showLoader}/>
     </>
   );
 };

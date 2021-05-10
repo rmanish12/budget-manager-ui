@@ -1,5 +1,5 @@
 import "date-fns";
-import React, { useState, ChangeEvent, FormEvent, MouseEvent } from "react";
+import React, { useState, useLayoutEffect, useRef, ChangeEvent, FormEvent, MouseEvent } from "react";
 import _ from "lodash";
 import moment from "moment";
 import DateFnsUtils from "@date-io/date-fns";
@@ -23,7 +23,7 @@ import {
 } from "@material-ui/core";
 import "../../App.css";
 
-interface RegisterationField {
+export interface UserDetails {
   firstName: string;
   lastName: string;
   email: string;
@@ -44,7 +44,7 @@ interface RegisterPropsI {
   switchLoginWindow: (value: boolean) => void;
 }
 
-const initialFormFieldValues: RegisterationField = {
+const initialFormFieldValues: UserDetails = {
   firstName: "",
   lastName: "",
   email: "",
@@ -63,12 +63,18 @@ const initialValidationState: RegistrationValidationError = {
 
 const Register: React.FC<RegisterPropsI> = (props) => {
 
+  // function to switch to login and register screen
   const { switchLoginWindow } = props;
 
-  const [userDetails, setUserDetails] = useState<RegisterationField>(
+  // using ref for referencing the first name input
+  const firstNameInput = useRef<HTMLInputElement>(null);
+
+  // defining state for user details
+  const [userDetails, setUserDetails] = useState<UserDetails>(
     _.cloneDeep(initialFormFieldValues)
   );
 
+  // defining state for checking validation status of each field to be checked
   const [
     validatedFields,
     setValidatedFields,
@@ -76,6 +82,14 @@ const Register: React.FC<RegisterPropsI> = (props) => {
     _.cloneDeep(initialValidationState)
   );
 
+  // use layout effect to focus first name input
+  useLayoutEffect(() => {
+    if(firstNameInput && firstNameInput.current) {
+      firstNameInput.current.focus();
+    }
+  });
+
+  // handler for date change for Material-UI date picker
   const handleDateChange = (date: Date | null) => {
     setUserDetails({
       ...userDetails,
@@ -83,6 +97,7 @@ const Register: React.FC<RegisterPropsI> = (props) => {
     })
   };
 
+  // handler to set different values to user details from the form
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -93,6 +108,7 @@ const Register: React.FC<RegisterPropsI> = (props) => {
     });
   };
 
+  // select handler for setting gender from the form
   const onSelectHandler = (e: ChangeEvent<{ value: unknown }>) => {
     setUserDetails({
       ...userDetails,
@@ -100,18 +116,21 @@ const Register: React.FC<RegisterPropsI> = (props) => {
     });
   };
 
+  // handler to perform operations when the form is submitted
+  // also called when user presses ENTER button
   const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setValidatedFields(_.cloneDeep(initialValidationState)); // NOT WORKING
 
     if (validateFormFields()) {
-      console.log("valid fields");
+      console.log("valid fields", userDetails);
     } else {
       console.log("invalid fields");
     }
   };
 
+  // function to validate different form fields
   const validateFormFields = (): boolean => {
     const { firstName, email, password, confirmPassword } = userDetails;
 
@@ -147,12 +166,13 @@ const Register: React.FC<RegisterPropsI> = (props) => {
     }
   };
 
+  // handler to reset form fields
   const onResetFormFields = (e: FormEvent<HTMLFormElement>) => {
-    console.log("clicked");
     const userDetails = _.clone(initialFormFieldValues);
     setUserDetails(userDetails);
   }
 
+  // handler to switch to login screen
   const onSwitchToLoginWindow = (e: MouseEvent<HTMLDivElement>) => {
     switchLoginWindow(true);
   }
@@ -168,6 +188,7 @@ const Register: React.FC<RegisterPropsI> = (props) => {
             type="text"
             variant="outlined"
             className="form-field"
+            inputRef={firstNameInput}
             error={!validatedFields.isFirstNameValid}
             value={userDetails.firstName}
             onChange={onChangeHandler}
