@@ -1,7 +1,15 @@
 import "date-fns";
-import React, { useState, useLayoutEffect, useRef, ChangeEvent, FormEvent, MouseEvent } from "react";
+import React, {
+  useState,
+  useLayoutEffect,
+  useRef,
+  ChangeEvent,
+  FormEvent,
+  MouseEvent,
+} from "react";
 import _ from "lodash";
 import moment from "moment";
+import axios from "axios";
 import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
@@ -21,9 +29,9 @@ import {
   InputLabel,
   FormControl,
 } from "@material-ui/core";
+import DialogBox, { DialogBoxPropsI } from "../../dialogBox/DialogBox";
 import "../../App.css";
-
-export interface UserDetails {
+interface UserDetails {
   firstName: string;
   lastName: string;
   email: string;
@@ -61,8 +69,14 @@ const initialValidationState: RegistrationValidationError = {
   isConfirmPasswordValid: true,
 };
 
-const Register: React.FC<RegisterPropsI> = (props) => {
+const initialDialogBoxProps: DialogBoxPropsI = {
+  show: false,
+  heading: "",
+  variant: "success",
+  body: "",
+};
 
+const Register: React.FC<RegisterPropsI> = (props) => {
   // function to switch to login and register screen
   const { switchLoginWindow } = props;
 
@@ -82,19 +96,24 @@ const Register: React.FC<RegisterPropsI> = (props) => {
     _.cloneDeep(initialValidationState)
   );
 
+  // defining state for content in dialog DialogBox
+  const [dialogBoxProps, setDialogBoxProps] = useState<DialogBoxPropsI>(
+    _.cloneDeep(initialDialogBoxProps)
+  );
+
   // use layout effect to focus first name input
   useLayoutEffect(() => {
-    if(firstNameInput && firstNameInput.current) {
+    if (firstNameInput && firstNameInput.current) {
       firstNameInput.current.focus();
     }
-  });
+  }, []);
 
   // handler for date change for Material-UI date picker
   const handleDateChange = (date: Date | null) => {
     setUserDetails({
       ...userDetails,
-      dateOfBirth: date
-    })
+      dateOfBirth: date,
+    });
   };
 
   // handler to set different values to user details from the form
@@ -118,13 +137,33 @@ const Register: React.FC<RegisterPropsI> = (props) => {
 
   // handler to perform operations when the form is submitted
   // also called when user presses ENTER button
-  const onSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setValidatedFields(_.cloneDeep(initialValidationState)); // NOT WORKING
 
     if (validateFormFields()) {
-      console.log("valid fields", userDetails);
+      const URL = "/user/register";
+      const body = _.omit(userDetails, ["confirmPassword"]);
+      console.log("body: ", body)
+      try {
+        const res = await axios.post(URL, body);
+        setDialogBoxProps({
+          show: true,
+          heading: "Registeration Success",
+          variant: "success",
+          body: res.data.message,
+        })
+      } catch (err) {
+        const error = err.response.data.message;
+        setDialogBoxProps({
+          show: true,
+          heading: "Registeration Error",
+          variant: "error",
+          body: error,
+        })
+      }
+
     } else {
       console.log("invalid fields");
     }
@@ -170,11 +209,17 @@ const Register: React.FC<RegisterPropsI> = (props) => {
   const onResetFormFields = (e: FormEvent<HTMLFormElement>) => {
     const userDetails = _.clone(initialFormFieldValues);
     setUserDetails(userDetails);
-  }
+  };
 
   // handler to switch to login screen
   const onSwitchToLoginWindow = (e: MouseEvent<HTMLDivElement>) => {
     switchLoginWindow(true);
+  };
+
+  // handler to hide the dialog box
+  const onHide = (e: MouseEvent<HTMLButtonElement>) => {
+    const dialogBoxProps = _.clone(initialDialogBoxProps);
+    setDialogBoxProps(dialogBoxProps);
   }
 
   return (
@@ -309,6 +354,11 @@ const Register: React.FC<RegisterPropsI> = (props) => {
       <div className="forgot-password-div" onClick={onSwitchToLoginWindow}>
         <span className="forgot-password">Already Registered? Sign In</span>
       </div>
+
+      <DialogBox
+        {...dialogBoxProps}
+        onHide={onHide}
+      />
     </>
   );
 };

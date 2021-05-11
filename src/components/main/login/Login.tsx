@@ -54,7 +54,7 @@ const Login: React.FC<LoginPropsI> = (props) => {
     if (emailInput && emailInput.current) {
       emailInput.current.focus();
     }
-  })
+  }, [])
 
   return (
     <>

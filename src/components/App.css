@@ -241,3 +241,24 @@ table {
   width: 100%;
   margin: 0% auto;
 }
+
+
+.success-dialog-box {
+  background-color: #39CCCC !important;
+  font-style: italic;
+}
+
+.warning-dialog-box {
+  background-color: #FFCC00 !important;
+  font-style: italic;
+}
+
+.error-dialog-box {
+  background-color: #CD5C5C !important;
+  font-style: italic;
+}
+
+.dialog-box-button {
+  border-color: none !important;
+  color: black !important;
+}
