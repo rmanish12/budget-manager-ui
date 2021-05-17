@@ -1,17 +1,35 @@
 import React from "react";
-import { Route, Switch } from "react-router-dom";
+import { Switch } from "react-router-dom";
 
-import Main from "./main/Main"
+import Base from "./hoc/Base";
+import ProtectedRoutes from "./hoc/ProtectedRoutes";
+import LoginWrapper from "./hoc/LoginRoute";
+import Main from "./main/Main";
 import Home from "./home/Home";
+import UserProfile from "./home/userProfile/UserProfile";
 
 function App() {
   return (
     <>
-    <Switch>
-      <Route path="/" exact component={Main}/>
+      <Base>
+        <Switch>
+          <LoginWrapper path="/" exact={true}>
+            <Main />
+          </LoginWrapper>
 
-      <Route path="/home" component={Home} />
-    </Switch>
+          <ProtectedRoutes path="/home">
+            <Home />
+          </ProtectedRoutes>
+
+          <ProtectedRoutes path="/home">
+            <Home />
+          </ProtectedRoutes>
+
+          <ProtectedRoutes path="/profile">
+            <UserProfile />
+          </ProtectedRoutes>
+        </Switch>
+      </Base>
     </>
   );
 }
